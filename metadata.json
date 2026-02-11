@@ -1,0 +1,5 @@
+{
+  "name": "InFinance",
+  "description": "A comprehensive single-page finance tracker with budgeting, investments, graphs, and PDF export capabilities.",
+  "requestFramePermissions": []
+}
