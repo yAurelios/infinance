@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://yaurelios.github.io/infinance",
+  "homepage": "https://GITHUB_USERNAME.github.io/REPO_NAME",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

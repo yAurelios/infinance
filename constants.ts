@@ -23,4 +23,7 @@ export const COLORS = [
   '#F97316', // Orange
   '#14B8A6', // Teal
   '#D946EF', // Fuchsia
+  '#9CA3AF', // Gray
+  '#FFFFFF', // White
+  '#374151', // Dark Gray
 ];
