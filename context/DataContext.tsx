@@ -92,7 +92,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       transactions,
       categories,
       investments,
-      theme: localStorage.getItem('infinance_theme') || 'light'
+      theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
     };
     localStorage.setItem('infinance_data', JSON.stringify(data));
   }, [transactions, categories, investments]);
@@ -123,7 +123,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       
       setTransactions(trans);
       setCategories(cats.length > 0 ? cats : DEFAULT_CATEGORIES);
-      setInvestimentos(invs);
+      setInvestments(invs);
     } catch (error) {
       console.error('Erro ao carregar dados da nuvem:', error);
       throw error;
@@ -199,10 +199,10 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     if (useCloudSync && user) {
       await saveInvestimento(i);
       const updated = await getInvestimentos();
-      setInvestimentos(updated);
+      setInvestments(updated);
     } else {
       const newId = `investimento_${Date.now()}`;
-      setInvestimentos(prev => [...prev, { ...i, id: newId } as Investment]);
+      setInvestments((prev: Investment[]) => [...prev, { ...i, id: newId } as Investment]);
     }
   }, [user, useCloudSync]);
 
@@ -210,9 +210,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     if (useCloudSync && user) {
       await updateInvestimento(id, data);
       const updated = await getInvestimentos();
-      setInvestimentos(updated);
+      setInvestments(updated);
     } else {
-      setInvestimentos(prev => prev.map(i => i.id === id ? { ...i, ...data } : i));
+      setInvestments((prev: Investment[]) => prev.map((i: Investment) => i.id === id ? { ...i, ...data } : i));
     }
   }, [user, useCloudSync]);
 
@@ -220,9 +220,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     if (useCloudSync && user) {
       await deleteInvestimento(id);
       const updated = await getInvestimentos();
-      setInvestimentos(updated);
+      setInvestments(updated);
     } else {
-      setInvestimentos(prev => prev.filter(i => i.id !== id));
+      setInvestments((prev: Investment[]) => prev.filter((i: Investment) => i.id !== id));
     }
   }, [user, useCloudSync]);
 
@@ -234,7 +234,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       transactions,
       categories,
       investments,
-      theme: localStorage.getItem('infinance_theme') || 'light'
+      theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
     };
 
     await saveBackupJSON(`backup_${new Date().toISOString()}`, backup);
