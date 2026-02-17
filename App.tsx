@@ -438,19 +438,28 @@ export default function App() {
                           <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-800/50">
                             <th className="px-6 py-4">Data</th>
                             <th className="px-6 py-4">Descrição</th>
+                            <th className="px-6 py-4">Inv/Categ</th>
                             <th className="px-6 py-4 text-right">Valor</th>
                             <th className="px-6 py-4 text-center">Ações</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                          {groupedTransactions[month].map(t => (
+                          {groupedTransactions[month].map(t => {
+                            const category = categories.find(c => c.id === t.categoryId);
+                            const investment = investments.find(i => i.id === t.investmentId);
+                            const categoryColor = t.type === 'investimento' ? investment?.color : category?.color;
+                            const categoryName = t.type === 'investimento' ? investment?.name : category?.name;
+                            return (
                             <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 group transition-colors">
                               <td className="px-6 py-5 whitespace-nowrap text-gray-400 font-bold text-xs">{new Date(t.date).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})}</td>
                               <td className="px-6 py-5">
                                 <p className="font-bold dark:text-white group-hover:text-blue-600 transition-colors">{t.description || <span className="italic opacity-40">Sem descrição</span>}</p>
-                                <p className="text-[10px] uppercase font-extrabold tracking-tighter text-gray-400">
-                                   {t.type === 'investimento' ? 'Investimento' : (categories.find(c => c.id === t.categoryId)?.name || 'Outros')}
-                                </p>
+                              </td>
+                              <td className="px-6 py-5">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-bold text-xs uppercase tracking-tighter" style={{backgroundColor: categoryColor ? `${categoryColor}15` : '#f3f4f6', color: categoryColor || '#9CA3AF'}}>
+                                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: categoryColor || '#9CA3AF'}}></div>
+                                  {categoryName || 'Outros'}
+                                </div>
                               </td>
                               <td className="px-6 py-5 font-black text-right whitespace-nowrap text-base" style={{color: t.type === 'gasto' ? '#EF4444' : t.type === 'investimento' ? '#3B82F6' : '#10B981'}}>
                                 {t.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -462,7 +471,7 @@ export default function App() {
                                 </div>
                               </td>
                             </tr>
-                          ))}
+                          )}
                         </tbody>
                       </table>
                     </div>
