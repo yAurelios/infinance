@@ -24,8 +24,14 @@ let auth: any = null;
 try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
+  console.log('✅ Firebase Auth inicializado com sucesso');
 } catch (error) {
-  console.warn('Firebase not initialized:', error);
+  console.error('❌ Erro ao inicializar Firebase Auth:', error);
+  console.error('Configuração:', {
+    apiKey: firebaseConfig.apiKey?.substring(0, 10) + '...',
+    authDomain: firebaseConfig.authDomain,
+    projectId: firebaseConfig.projectId
+  });
 }
 
 export { auth };export const registerUser = async (email: string, password: string): Promise<User> => {

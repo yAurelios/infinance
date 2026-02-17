@@ -59,15 +59,28 @@ export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthenticated })
         onAuthenticated();
       }
     } catch (err: any) {
-      const errorMessage = err.code === 'auth/email-already-in-use'
-        ? 'Este email já está registrado'
-        : err.code === 'auth/invalid-email'
-        ? 'Email inválido'
-        : err.code === 'auth/user-not-found'
-        ? 'Usuário não encontrado'
-        : err.code === 'auth/wrong-password'
-        ? 'Senha incorreta'
-        : err.message || 'Erro ao processar';
+      console.error('Erro de autenticação:', err?.code, err?.message);
+      
+      // Mapear erros específicos
+      let errorMessage = '';
+      
+      if (err?.code === 'auth/api-key-not-valid') {
+        errorMessage = '❌ Chave API do Firebase inválida ou revogada. Verifique o console.firebase.google.com';
+      } else if (err?.code === 'auth/email-already-in-use') {
+        errorMessage = 'Este email já está registrado';
+      } else if (err?.code === 'auth/invalid-email') {
+        errorMessage = 'Email inválido';
+      } else if (err?.code === 'auth/user-not-found') {
+        errorMessage = 'Usuário não encontrado';
+      } else if (err?.code === 'auth/wrong-password') {
+        errorMessage = 'Senha incorreta';
+      } else if (err?.code === 'auth/network-request-failed') {
+        errorMessage = '❌ Erro de conexão. Verifique sua internet ou a disponibilidade do Firebase';
+      } else if (err?.code?.includes('firebase')) {
+        errorMessage = `❌ Erro Firebase: ${err.code}. O projeto pode ter sido deletado.`;
+      } else {
+        errorMessage = err.message || 'Erro ao processar';
+      }
       
       setError(errorMessage);
     } finally {
@@ -206,22 +219,35 @@ export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthenticated })
             </button>
           </div>
 
-          {/* Alert: Firebase Credentials Missing */}
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg space-y-3">
+          {/* Alert: Firebase Credentials Issue */}
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg space-y-3">
             <div className="flex gap-2">
-              <AlertCircle className="text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" size={18} />
+              <AlertCircle className="text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" size={18} />
               <div className="text-sm">
-                <p className="font-bold text-yellow-800 dark:text-yellow-200 mb-1">Firebase não configurado</p>
-                <p className="text-yellow-700 dark:text-yellow-300 text-xs mb-3">
-                  Adicione suas credenciais do Firebase no arquivo <code className="bg-yellow-100 dark:bg-yellow-900/50 px-2 py-1 rounded text-xs">.env.local</code>
+                <p className="font-bold text-red-800 dark:text-red-200 mb-1">⚠️ Erro na Autenticação Firebase</p>
+                <p className="text-red-700 dark:text-red-300 text-xs mb-3">
+                  A API Key do Firebase está inválida ou o projeto foi deletado.
                 </p>
-                <button
-                  type="button"
-                  onClick={handleDemoMode}
-                  className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded-lg text-xs transition-all"
-                >
-                  Usar Modo Demo (Apenas Local)
-                </button>
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={handleDemoMode}
+                    className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-all"
+                  >
+                    🔓 Modo Demo (Sem Login)
+                  </button>
+                  <details className="text-[10px] text-red-700 dark:text-red-400 mt-2">
+                    <summary className="cursor-pointer font-bold">✏️ Como corrigir?</summary>
+                    <div className="mt-2 space-y-1 pl-2">
+                      <p>1. Acesse: <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">console.firebase.google.com</a></p>
+                      <p>2. Verifique se o projeto "infinance-web" ainda existe</p>
+                      <p>3. Se deletado, crie um novo projeto</p>
+                      <p>4. Copie as credenciais de um app Web</p>
+                      <p>5. Atualize o arquivo <code className="bg-red-200 dark:bg-red-800 px-1">.env.local</code></p>
+                      <p>6. Reinicie o servidor: <code className="bg-red-200 dark:bg-red-800 px-1">npm run dev</code></p>
+                    </div>
+                  </details>
+                </div>
               </div>
             </div>
           </div>
