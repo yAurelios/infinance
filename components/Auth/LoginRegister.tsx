@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Wallet } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Wallet, AlertCircle } from 'lucide-react';
 import { registerUser, loginUser } from '../../services/authService';
 
 interface LoginRegisterProps {
@@ -14,6 +14,20 @@ export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthenticated })
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
+
+  const handleDemoMode = () => {
+    // Demo mode: use localStorage without Firebase
+    localStorage.setItem('infinance_demoUser', JSON.stringify({
+      uid: 'demo_' + Date.now(),
+      email: 'demo@infinance.local',
+      name: 'Usuário Demo'
+    }));
+    setDemoMode(true);
+    if (onAuthenticated) {
+      setTimeout(onAuthenticated, 500);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -190,6 +204,26 @@ export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthenticated })
             >
               {isLogin ? 'Criar agora' : 'Entrar agora'}
             </button>
+          </div>
+
+          {/* Alert: Firebase Credentials Missing */}
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg space-y-3">
+            <div className="flex gap-2">
+              <AlertCircle className="text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" size={18} />
+              <div className="text-sm">
+                <p className="font-bold text-yellow-800 dark:text-yellow-200 mb-1">Firebase não configurado</p>
+                <p className="text-yellow-700 dark:text-yellow-300 text-xs mb-3">
+                  Adicione suas credenciais do Firebase no arquivo <code className="bg-yellow-100 dark:bg-yellow-900/50 px-2 py-1 rounded text-xs">.env.local</code>
+                </p>
+                <button
+                  type="button"
+                  onClick={handleDemoMode}
+                  className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded-lg text-xs transition-all"
+                >
+                  Usar Modo Demo (Apenas Local)
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

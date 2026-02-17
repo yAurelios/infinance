@@ -266,6 +266,8 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
 
   const handleLogout = async () => {
     try {
+      // Clear demo mode
+      localStorage.removeItem('infinance_demoUser');
       await logoutUser();
       addToast("Desconectado com sucesso", 'info');
     } catch (error) {

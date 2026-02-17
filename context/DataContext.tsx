@@ -84,6 +84,20 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   // Monitorar autenticação
   useEffect(() => {
+    // Check for demo mode
+    const demoUser = localStorage.getItem('infinance_demoUser');
+    if (demoUser) {
+      try {
+        const user = JSON.parse(demoUser);
+        setUser(user as any);
+        loadFromLocalStorage();
+        setIsLoading(false);
+        return;
+      } catch (error) {
+        console.error('Erro ao carregar demo mode:', error);
+      }
+    }
+
     const unsubscribe = onAuthChange(async (currentUser) => {
       setUser(currentUser);
       
