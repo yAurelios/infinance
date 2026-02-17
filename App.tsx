@@ -358,7 +358,7 @@ export default function App() {
           </div>
         </aside>
 
-        <main className={`flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-gray-950 p-4 md:p-6 ${activeMobileTab === 'main' ? 'block' : 'hidden md:block'}`}>
+        <main className={`flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-gray-950 p-4 md:p-6 pb-24 md:pb-6 ${activeMobileTab === 'main' ? 'block' : 'hidden md:block'}`}>
           {showGraph ? (
              <div className="flex flex-col h-full animate-fade-in space-y-4">
                 <div className="flex justify-between items-center mb-2">
@@ -546,7 +546,7 @@ export default function App() {
         </aside>
       </div>
 
-      <footer className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-between items-end px-2 pb-4 pt-2 z-20">
+      <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-between items-end px-2 py-4 z-50 h-auto">
         <button 
           onClick={() => setShowGraph(false)} 
           className={`flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all duration-300 ${!showGraph ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'}`}
@@ -563,7 +563,7 @@ export default function App() {
           <span className={`text-[10px] font-bold mt-1 ${showGraph ? 'block' : 'hidden'}`}>Análise</span>
         </button>
 
-        <div className="relative -top-5">
+        <div className="relative top-8">
           <button 
             onClick={() => { setEditingItem(null); setIsTransactionModalOpen(true); }} 
             className="flex items-center justify-center w-14 h-14 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-600/30 transform transition-transform active:scale-95 border-4 border-gray-50 dark:border-gray-950"
