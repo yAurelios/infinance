@@ -450,28 +450,29 @@ export default function App() {
                             const categoryColor = t.type === 'investimento' ? investment?.color : category?.color;
                             const categoryName = t.type === 'investimento' ? investment?.name : category?.name;
                             return (
-                            <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 group transition-colors">
-                              <td className="px-6 py-5 whitespace-nowrap text-gray-400 font-bold text-xs">{new Date(t.date).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})}</td>
-                              <td className="px-6 py-5">
-                                <p className="font-bold dark:text-white group-hover:text-blue-600 transition-colors">{t.description || <span className="italic opacity-40">Sem descrição</span>}</p>
-                              </td>
-                              <td className="px-6 py-5">
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-bold text-xs uppercase tracking-tighter" style={{backgroundColor: categoryColor ? `${categoryColor}15` : '#f3f4f6', color: categoryColor || '#9CA3AF'}}>
-                                  <div className="w-2 h-2 rounded-full" style={{backgroundColor: categoryColor || '#9CA3AF'}}></div>
-                                  {categoryName || 'Outros'}
-                                </div>
-                              </td>
-                              <td className="px-6 py-5 font-black text-right whitespace-nowrap text-base" style={{color: t.type === 'gasto' ? '#EF4444' : t.type === 'investimento' ? '#3B82F6' : '#10B981'}}>
-                                {t.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                              </td>
-                              <td className="px-6 py-5 text-center">
-                                <div className="flex justify-center items-center gap-2 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button onClick={() => { setEditingItem(t); setIsTransactionModalOpen(true); }} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all"><Edit2 size={16}/></button>
-                                  <button onClick={() => handleDelete('transaction', t.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all"><Trash2 size={16}/></button>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
+                              <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 group transition-colors">
+                                <td className="px-6 py-5 whitespace-nowrap text-gray-400 font-bold text-xs">{new Date(t.date).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})}</td>
+                                <td className="px-6 py-5">
+                                  <p className="font-bold dark:text-white group-hover:text-blue-600 transition-colors">{t.description || <span className="italic opacity-40">Sem descrição</span>}</p>
+                                </td>
+                                <td className="px-6 py-5">
+                                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-bold text-xs uppercase tracking-tighter" style={{backgroundColor: categoryColor ? `${categoryColor}15` : '#f3f4f6', color: categoryColor || '#9CA3AF'}}>
+                                    <div className="w-2 h-2 rounded-full" style={{backgroundColor: categoryColor || '#9CA3AF'}}></div>
+                                    {categoryName || 'Outros'}
+                                  </div>
+                                </td>
+                                <td className="px-6 py-5 font-black text-right whitespace-nowrap text-base" style={{color: t.type === 'gasto' ? '#EF4444' : t.type === 'investimento' ? '#3B82F6' : '#10B981'}}>
+                                  {t.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                </td>
+                                <td className="px-6 py-5 text-center">
+                                  <div className="flex justify-center items-center gap-2 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => { setEditingItem(t); setIsTransactionModalOpen(true); }} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all"><Edit2 size={16}/></button>
+                                    <button onClick={() => handleDelete('transaction', t.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all"><Trash2 size={16}/></button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
