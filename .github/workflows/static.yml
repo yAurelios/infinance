@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Faz o upload apenas da pasta gerada pelo build do Vite
-          path: './dist'
+          path: 'dist'
 
   deploy:
     environment:
