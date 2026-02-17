@@ -17,19 +17,27 @@ import { auth } from './authService';
 import type { Transaction, Category, Investment } from '../types';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-api-key',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'demo.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'demo-project',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'demo.appspot.com',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || 'demo-app-id',
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app: any = null;
+let db: any = null;
+
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+} catch (error) {
+  console.warn('Firebase Firestore not initialized:', error);
+}
 
 // ===== TRANSAÇÕES =====
 export const saveTransacao = async (transacao: Omit<Transaction, 'id'>) => {
+  if (!db) throw new Error('Firestore não inicializado');
   const user = auth.currentUser;
   if (!user) throw new Error('Usuário não autenticado');
 
@@ -64,17 +72,23 @@ export const deleteTransacao = async (transacaoId: string) => {
 };
 
 export const getTransacoes = async (): Promise<Transaction[]> => {
+  if (!db) return [];
   const user = auth.currentUser;
-  if (!user) throw new Error('Usuário não autenticado');
+  if (!user) return [];
 
-  const transacoesRef = collection(db, 'users', user.uid, 'transacoes');
-  const q = query(transacoesRef, orderBy('date', 'desc'));
-  
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id
-  })) as Transaction[];
+  try {
+    const transacoesRef = collection(db, 'users', user.uid, 'transacoes');
+    const q = query(transacoesRef, orderBy('date', 'desc'));
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
+    })) as Transaction[];
+  } catch (error) {
+    console.error('Erro ao carregar transações:', error);
+    return [];
+  }
 };
 
 // ===== CATEGORIAS =====
@@ -112,16 +126,22 @@ export const deleteCategoria = async (categoriaId: string) => {
 };
 
 export const getCategorias = async (): Promise<Category[]> => {
+  if (!db) return [];
   const user = auth.currentUser;
-  if (!user) throw new Error('Usuário não autenticado');
+  if (!user) return [];
 
-  const categoriasRef = collection(db, 'users', user.uid, 'categorias');
-  const snapshot = await getDocs(categoriasRef);
-  
-  return snapshot.docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id
-  })) as Category[];
+  try {
+    const categoriasRef = collection(db, 'users', user.uid, 'categorias');
+    const snapshot = await getDocs(categoriasRef);
+    
+    return snapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
+    })) as Category[];
+  } catch (error) {
+    console.error('Erro ao carregar categorias:', error);
+    return [];
+  }
 };
 
 // ===== INVESTIMENTOS =====
@@ -159,16 +179,22 @@ export const deleteInvestimento = async (investimentoId: string) => {
 };
 
 export const getInvestimentos = async (): Promise<Investment[]> => {
+  if (!db) return [];
   const user = auth.currentUser;
-  if (!user) throw new Error('Usuário não autenticado');
+  if (!user) return [];
 
-  const investimentosRef = collection(db, 'users', user.uid, 'investimentos');
-  const snapshot = await getDocs(investimentosRef);
-  
-  return snapshot.docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id
-  })) as Investment[];
+  try {
+    const investimentosRef = collection(db, 'users', user.uid, 'investimentos');
+    const snapshot = await getDocs(investimentosRef);
+    
+    return snapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
+    })) as Investment[];
+  } catch (error) {
+    console.error('Erro ao carregar investimentos:', error);
+    return [];
+  }
 };
 
 // ===== BACKUP JSON =====

@@ -3,10 +3,10 @@ import { Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Wallet } from 'lucide-react';
 import { registerUser, loginUser } from '../../services/authService';
 
 interface LoginRegisterProps {
-  onAuthSuccess?: () => void;
+  onAuthenticated?: () => void;
 }
 
-export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthSuccess }) => {
+export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthenticated }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,8 +41,8 @@ export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthSuccess }) =
       setPassword('');
       setPasswordConfirm('');
       
-      if (onAuthSuccess) {
-        onAuthSuccess();
+      if (onAuthenticated) {
+        onAuthenticated();
       }
     } catch (err: any) {
       const errorMessage = err.code === 'auth/email-already-in-use'

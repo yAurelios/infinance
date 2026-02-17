@@ -64,6 +64,24 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [investments, setInvestments] = useState<Investment[]>([]);
 
+  // Carregar da nuvem
+  const loadFromCloudData = useCallback(async () => {
+    try {
+      const [trans, cats, invs] = await Promise.all([
+        getTransacoes(),
+        getCategorias(),
+        getInvestimentos()
+      ]);
+      
+      setTransactions(trans);
+      setCategories(cats.length > 0 ? cats : DEFAULT_CATEGORIES);
+      setInvestments(invs);
+    } catch (error) {
+      console.error('Erro ao carregar dados da nuvem:', error);
+      throw error;
+    }
+  }, []);
+
   // Monitorar autenticação
   useEffect(() => {
     const unsubscribe = onAuthChange(async (currentUser) => {
@@ -84,7 +102,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     });
 
     return unsubscribe;
-  }, [useCloudSync]);
+  }, [useCloudSync, loadFromCloudData]);
 
   // Salvar no localStorage sempre
   useEffect(() => {
@@ -109,24 +127,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       } catch (error) {
         console.error('Erro ao carregar dados locais:', error);
       }
-    }
-  }, []);
-
-  // Carregar da nuvem
-  const loadFromCloudData = useCallback(async () => {
-    try {
-      const [trans, cats, invs] = await Promise.all([
-        getTransacoes(),
-        getCategorias(),
-        getInvestimentos()
-      ]);
-      
-      setTransactions(trans);
-      setCategories(cats.length > 0 ? cats : DEFAULT_CATEGORIES);
-      setInvestments(invs);
-    } catch (error) {
-      console.error('Erro ao carregar dados da nuvem:', error);
-      throw error;
     }
   }, []);
 

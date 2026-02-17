@@ -37,7 +37,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function AppContent() {
+export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => void }) {
   const {
     user,
     transactions,
@@ -356,6 +356,11 @@ export default function AppContent() {
                     {useCloudSync ? <Cloud size={18} className="text-blue-500" /> : <HardDrive size={18} className="text-gray-400" />}
                     <span className="font-bold text-gray-600 dark:text-gray-300">{useCloudSync ? 'Sincronizando na nuvem' : 'Apenas local'}</span>
                   </div>
+                  {onRequestLogin && (
+                    <button onClick={() => { onRequestLogin(); setMobileMenuOpen(false); }} className="flex items-center gap-3 w-full p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-100 transition-colors">
+                      <LogOut size={20} /> Trocar Conta
+                    </button>
+                  )}
                   <button onClick={handleLogout} className="flex items-center gap-3 w-full p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl font-bold text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">
                    <LogOut size={20} /> Sair da Conta
                 </button>
@@ -395,6 +400,9 @@ export default function AppContent() {
                <input type="file" onChange={importBackup} className="hidden" accept=".json" />
              </label>
              <button onClick={() => setDarkMode(!darkMode)} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">{darkMode ? <Sun size={18}/> : <Moon size={18}/>} Tema</button>
+             {onRequestLogin && (
+               <button onClick={onRequestLogin} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"><LogOut size={18}/> Trocar Conta</button>
+             )}
              <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"><LogOut size={18}/> Sair</button>
           </div>
         </aside>
