@@ -152,9 +152,21 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       setTransactions(updated);
     } else {
       const newId = `transacao_${Date.now()}`;
-      setTransactions(prev => [...prev, { ...t, id: newId } as Transaction]);
+      const newTransaction = { ...t, id: newId } as Transaction;
+      setTransactions(prev => {
+        const updated = [...prev, newTransaction];
+        // Salvar imediatamente no localStorage para modo demo
+        const data: BackupData = {
+          transactions: updated,
+          categories,
+          investments,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(data));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, categories, investments]);
 
   const updateTransactionData = useCallback(async (id: string, data: Partial<Transaction>) => {
     if (useCloudSync && user) {
@@ -162,9 +174,20 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       const updated = await getTransacoes();
       setTransactions(updated);
     } else {
-      setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...data } : t));
+      setTransactions(prev => {
+        const updated = prev.map(t => t.id === id ? { ...t, ...data } : t);
+        // Salvar imediatamente no localStorage para modo demo
+        const backupData: BackupData = {
+          transactions: updated,
+          categories,
+          investments,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, categories, investments]);
 
   const deleteTransactionData = useCallback(async (id: string) => {
     if (useCloudSync && user) {
@@ -172,9 +195,20 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       const updated = await getTransacoes();
       setTransactions(updated);
     } else {
-      setTransactions(prev => prev.filter(t => t.id !== id));
+      setTransactions(prev => {
+        const updated = prev.filter(t => t.id !== id);
+        // Salvar imediatamente no localStorage para modo demo
+        const backupData: BackupData = {
+          transactions: updated,
+          categories,
+          investments,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, categories, investments]);
 
   // Categorias
   const addCategory = useCallback(async (c: Omit<Category, 'id'>) => {
@@ -184,9 +218,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       setCategories(updated.length > 0 ? updated : DEFAULT_CATEGORIES);
     } else {
       const newId = `categoria_${Date.now()}`;
-      setCategories(prev => [...prev, { ...c, id: newId } as Category]);
+      setCategories(prev => {
+        const updated = [...prev, { ...c, id: newId } as Category];
+        const backupData: BackupData = {
+          transactions,
+          categories: updated,
+          investments,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, transactions, investments]);
 
   const updateCategoryData = useCallback(async (id: string, data: Partial<Category>) => {
     if (useCloudSync && user) {
@@ -194,9 +238,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       const updated = await getCategorias();
       setCategories(updated.length > 0 ? updated : DEFAULT_CATEGORIES);
     } else {
-      setCategories(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
+      setCategories(prev => {
+        const updated = prev.map(c => c.id === id ? { ...c, ...data } : c);
+        const backupData: BackupData = {
+          transactions,
+          categories: updated,
+          investments,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, transactions, investments]);
 
   const deleteCategoryData = useCallback(async (id: string) => {
     if (useCloudSync && user) {
@@ -204,9 +258,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       const updated = await getCategorias();
       setCategories(updated.length > 0 ? updated : DEFAULT_CATEGORIES);
     } else {
-      setCategories(prev => prev.filter(c => c.id !== id));
+      setCategories(prev => {
+        const updated = prev.filter(c => c.id !== id);
+        const backupData: BackupData = {
+          transactions,
+          categories: updated,
+          investments,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, transactions, investments]);
 
   // Investimentos
   const addInvestment = useCallback(async (i: Omit<Investment, 'id'>) => {
@@ -216,9 +280,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       setInvestments(updated);
     } else {
       const newId = `investimento_${Date.now()}`;
-      setInvestments((prev: Investment[]) => [...prev, { ...i, id: newId } as Investment]);
+      setInvestments((prev: Investment[]) => {
+        const updated = [...prev, { ...i, id: newId } as Investment];
+        const backupData: BackupData = {
+          transactions,
+          categories,
+          investments: updated,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, transactions, categories]);
 
   const updateInvestmentData = useCallback(async (id: string, data: Partial<Investment>) => {
     if (useCloudSync && user) {
@@ -226,9 +300,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       const updated = await getInvestimentos();
       setInvestments(updated);
     } else {
-      setInvestments((prev: Investment[]) => prev.map((i: Investment) => i.id === id ? { ...i, ...data } : i));
+      setInvestments((prev: Investment[]) => {
+        const updated = prev.map((i: Investment) => i.id === id ? { ...i, ...data } : i);
+        const backupData: BackupData = {
+          transactions,
+          categories,
+          investments: updated,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, transactions, categories]);
 
   const deleteInvestmentData = useCallback(async (id: string) => {
     if (useCloudSync && user) {
@@ -236,9 +320,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       const updated = await getInvestimentos();
       setInvestments(updated);
     } else {
-      setInvestments((prev: Investment[]) => prev.filter((i: Investment) => i.id !== id));
+      setInvestments((prev: Investment[]) => {
+        const updated = prev.filter((i: Investment) => i.id !== id);
+        const backupData: BackupData = {
+          transactions,
+          categories,
+          investments: updated,
+          theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
+        };
+        localStorage.setItem('infinance_data', JSON.stringify(backupData));
+        return updated;
+      });
     }
-  }, [user, useCloudSync]);
+  }, [user, useCloudSync, transactions, categories]);
 
   // Sincronização
   const syncToCloud = useCallback(async () => {

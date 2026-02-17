@@ -170,6 +170,8 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
   };
 
   const handleSaveTransaction = async (data: Partial<Transaction>) => {
+    console.log('handleSaveTransaction chamado com:', data);
+    
     if (data.type === 'gasto' && !data.isResgate && (data.value || 0) > currentBalance) {
         alert("Erro: O saldo atual não comporta este gasto.");
         return;
@@ -180,7 +182,9 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
         await updateTransactionData(editingItem.id, data);
         addToast(`Lançamento "${data.description || 'S/D'}" atualizado`, 'transaction');
       } else {
+        console.log('Adicionando nova transação...');
         await addTransaction(data as Omit<Transaction, 'id'>);
+        console.log('Transação adicionada com sucesso');
         addToast(`Novo lançamento "${data.description || 'S/D'}" registrado`, 'transaction');
       }
 
@@ -192,6 +196,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
         }
       }
     } catch (error) {
+      console.error('Erro ao salvar transação:', error);
       addToast("Erro ao salvar transação", 'info');
     }
     
@@ -376,7 +381,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
         </div>
       )}
 
-      <div className="md:hidden h-16 bg-white dark:bg-gray-900 border-b dark:border-gray-800 flex items-center justify-between px-4 z-20">
+      <div className="md:hidden h-16 bg-white dark:bg-gray-900 border-b dark:border-gray-800 flex items-center justify-between px-4 z-40 relative">
         <h1 className="font-extrabold text-xl tracking-tight text-blue-600 flex items-center gap-2"><Wallet size={24} /> InFinance</h1>
         <button onClick={() => setMobileMenuOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"><Menu className="dark:text-white" /></button>
       </div>

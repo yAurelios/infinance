@@ -37,15 +37,55 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+    
+    // Validação
+    if (!desc && type !== 'investimento') {
+      alert('Descrição é obrigatória');
+      return;
+    }
+    if (!val || Number(val) <= 0) {
+      alert('Valor deve ser maior que 0');
+      return;
+    }
+    if (!date) {
+      alert('Data é obrigatória');
+      return;
+    }
+    if ((type === 'entrada' || (type === 'gasto' && !isResgate)) && !catId) {
+      alert('Selecione uma categoria');
+      return;
+    }
+    if ((type === 'investimento' || isResgate) && !invId) {
+      alert('Selecione um investimento');
+      return;
+    }
+
+    console.log('Enviando transação:', { type, isResgate, description: desc, value: Number(val), date, categoryId: catId, investmentId: invId });
+    
+    // Montar objeto sem campos undefined
+    const transactionData: any = {
       type,
-      isResgate: type === 'gasto' ? isResgate : undefined,
       description: desc,
       value: Number(val),
       date,
-      categoryId: type !== 'investimento' && !isResgate ? catId : undefined,
-      investmentId: type === 'investimento' || isResgate ? invId : undefined,
-    });
+    };
+
+    // Adicionar campos opcionais apenas se não forem undefined
+    if (type === 'gasto' && isResgate) {
+      transactionData.isResgate = true;
+    }
+    
+    if (type !== 'investimento' && !isResgate && catId) {
+      transactionData.categoryId = catId;
+    }
+    
+    if ((type === 'investimento' || isResgate) && invId) {
+      transactionData.investmentId = invId;
+    }
+    
+    console.log('Dados finais para salvar:', transactionData);
+    
+    onSave(transactionData);
   };
 
   return (
