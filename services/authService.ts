@@ -29,10 +29,21 @@ console.log('  apiKey:', firebaseConfig.apiKey?.substring(0, 15) + '...');
 console.log('  authDomain:', firebaseConfig.authDomain);
 console.log('  projectId:', firebaseConfig.projectId);
 
+// Validação adicional para facilitar diagnóstico em deploys (GH Pages, CI)
+if (!import.meta.env.VITE_FIREBASE_API_KEY) {
+  console.error('❌ VITE_FIREBASE_API_KEY não definida no build. Verifique .env.local (dev) ou secrets no CI (production).');
+}
+if (firebaseConfig.apiKey && typeof firebaseConfig.apiKey === 'string' && firebaseConfig.apiKey.includes('demo')) {
+  console.warn('⚠️ Firebase API key parece ser um valor de fallback (demo). Isso causará erro auth/api-key-not-valid em runtime.');
+}
+
 let app: any = null;
 let auth: any = null;
 
 try {
+  if (!import.meta.env.VITE_FIREBASE_API_KEY || (firebaseConfig.apiKey && firebaseConfig.apiKey.includes('demo'))) {
+    throw new Error('Firebase API key inválida ou ausente — pulando inicialização para evitar erros silenciosos.');
+  }
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   console.log('✅ Firebase Auth inicializado com SUCESSO!');
