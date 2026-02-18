@@ -6,10 +6,7 @@ Este erro significa que a **API Key do Firebase é inválida ou foi revogada**.
 
 ### ✅ Soluções:
 
-#### **Opção 1: Usar Modo Demo (Rápido)**
-Na tela de login, clique no botão **"🔓 Modo Demo (Sem Login)"** para usar o app localmente sem Firebase.
-
----
+<!-- Modo Demo removido: a aplicação agora requer autenticação via Firebase. -->
 
 #### **Opção 2: Verificar o Projeto Firebase (Recomendado)**
 
@@ -199,14 +196,7 @@ cat c:\Users\jpaur\Documents\GitHub\infinance\.env.local
 
 ---
 
-## 💾 Alternativa: Usar Modo Demo Permanente
-
-Se não quer usar Firebase, use o **Modo Demo**:
-1. Na tela de login
-2. Clique em **"🔓 Modo Demo (Sem Login)"**
-3. Os dados são salvos **apenas localmente** no navegador
-
----
+<!-- Modo Demo removido: para uso sem Firebase, importe/exporte backups locais manualmente. -->
 
 ## 📞 Ainda Não Resolveu?
 

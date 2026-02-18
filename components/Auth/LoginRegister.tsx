@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Wallet, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Wallet } from 'lucide-react';
 import { registerUser, loginUser } from '../../services/authService';
 
 interface LoginRegisterProps {
@@ -14,20 +14,9 @@ export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthenticated })
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
+  
 
-  const handleDemoMode = () => {
-    // Demo mode: use localStorage without Firebase
-    localStorage.setItem('infinance_demoUser', JSON.stringify({
-      uid: 'demo_' + Date.now(),
-      email: 'demo@infinance.local',
-      name: 'Usuário Demo'
-    }));
-    setDemoMode(true);
-    if (onAuthenticated) {
-      setTimeout(onAuthenticated, 500);
-    }
-  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,38 +208,7 @@ export const LoginRegister: React.FC<LoginRegisterProps> = ({ onAuthenticated })
             </button>
           </div>
 
-          {/* Alert: Firebase Credentials Issue */}
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg space-y-3">
-            <div className="flex gap-2">
-              <AlertCircle className="text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" size={18} />
-              <div className="text-sm">
-                <p className="font-bold text-red-800 dark:text-red-200 mb-1">⚠️ Erro na Autenticação Firebase</p>
-                <p className="text-red-700 dark:text-red-300 text-xs mb-3">
-                  A API Key do Firebase está inválida ou o projeto foi deletado.
-                </p>
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={handleDemoMode}
-                    className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-all"
-                  >
-                    🔓 Modo Demo (Sem Login)
-                  </button>
-                  <details className="text-[10px] text-red-700 dark:text-red-400 mt-2">
-                    <summary className="cursor-pointer font-bold">✏️ Como corrigir?</summary>
-                    <div className="mt-2 space-y-1 pl-2">
-                      <p>1. Acesse: <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">console.firebase.google.com</a></p>
-                      <p>2. Verifique se o projeto "infinance-web" ainda existe</p>
-                      <p>3. Se deletado, crie um novo projeto</p>
-                      <p>4. Copie as credenciais de um app Web</p>
-                      <p>5. Atualize o arquivo <code className="bg-red-200 dark:bg-red-800 px-1">.env.local</code></p>
-                      <p>6. Reinicie o servidor: <code className="bg-red-200 dark:bg-red-800 px-1">npm run dev</code></p>
-                    </div>
-                  </details>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Demo mode removed */}
         </div>
 
         {/* Footer */}

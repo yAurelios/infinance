@@ -84,23 +84,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   // Monitorar autenticação
   useEffect(() => {
-    // Check for demo mode
-    const demoUser = localStorage.getItem('infinance_demoUser');
-    if (demoUser) {
-      try {
-        const user = JSON.parse(demoUser);
-        setUser(user as any);
-        loadFromLocalStorage();
-        setIsLoading(false);
-        return;
-      } catch (error) {
-        console.error('Erro ao carregar demo mode:', error);
-      }
-    }
-
     const unsubscribe = onAuthChange(async (currentUser) => {
       setUser(currentUser);
-      
+
       if (currentUser && useCloudSync) {
         try {
           await loadFromCloudData();
@@ -111,7 +97,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       } else if (!currentUser) {
         loadFromLocalStorage();
       }
-      
+
       setIsLoading(false);
     });
 
@@ -155,7 +141,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       const newTransaction = { ...t, id: newId } as Transaction;
       setTransactions(prev => {
         const updated = [...prev, newTransaction];
-        // Salvar imediatamente no localStorage para modo demo
+        // Salvar imediatamente no localStorage
         const data: BackupData = {
           transactions: updated,
           categories,
@@ -176,7 +162,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     } else {
       setTransactions(prev => {
         const updated = prev.map(t => t.id === id ? { ...t, ...data } : t);
-        // Salvar imediatamente no localStorage para modo demo
+        // Salvar imediatamente no localStorage
         const backupData: BackupData = {
           transactions: updated,
           categories,
@@ -197,7 +183,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     } else {
       setTransactions(prev => {
         const updated = prev.filter(t => t.id !== id);
-        // Salvar imediatamente no localStorage para modo demo
+        // Salvar imediatamente no localStorage
         const backupData: BackupData = {
           transactions: updated,
           categories,

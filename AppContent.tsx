@@ -271,8 +271,6 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
 
   const handleLogout = async () => {
     try {
-      // Clear demo mode
-      localStorage.removeItem('infinance_demoUser');
       await logoutUser();
       addToast("Desconectado com sucesso", 'info');
     } catch (error) {
@@ -281,7 +279,16 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
   };
 
   const groupedTransactions = useMemo(() => {
-    const filtered = transactions.filter(t => t.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const term = searchTerm.trim().toLowerCase();
+    const filtered = transactions.filter(t => {
+      if (!term) return true;
+      const desc = (t.description || '').toLowerCase();
+      const catName = (categories.find(c => c.id === t.categoryId)?.name || '').toLowerCase();
+      const invName = (investments.find(i => i.id === t.investmentId)?.name || '').toLowerCase();
+      const valueStr = String(t.value || '').toLowerCase();
+      const dateStr = new Date(t.date).toLocaleDateString('pt-BR').toLowerCase();
+      return desc.includes(term) || catName.includes(term) || invName.includes(term) || valueStr.includes(term) || dateStr.includes(term);
+    });
     const grouped: Record<string, Transaction[]> = {};
     filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).forEach(t => {
       const monthYear = new Date(t.date).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
@@ -363,26 +370,25 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
                     {useCloudSync ? <Cloud size={18} className="text-blue-500" /> : <HardDrive size={18} className="text-gray-400" />}
                     <span className="font-bold text-gray-600 dark:text-gray-300">{useCloudSync ? 'Sincronizando na nuvem' : 'Apenas local'}</span>
                   </div>
-                  {onRequestLogin && (
-                    <button onClick={() => { onRequestLogin(); setMobileMenuOpen(false); }} className="flex items-center gap-3 w-full p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-100 transition-colors">
-                      <LogOut size={20} /> Trocar Conta
-                    </button>
-                  )}
+                  {/* 'Trocar Conta' removed - use 'Sair' to go back to login */}
                   <button onClick={handleLogout} className="flex items-center gap-3 w-full p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl font-bold text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">
                    <LogOut size={20} /> Sair da Conta
                 </button>
                 </div>
              </div>
 
-             <div className="text-center text-xs text-gray-400 font-bold mt-4">
-                InFinance v2.0 • {user?.email}
-             </div>
+             <div className="text-center text-xs text-gray-400 font-bold mt-4">InFinance v2.0</div>
           </div>
         </div>
       )}
 
       <div className="md:hidden h-16 bg-white dark:bg-gray-900 border-b dark:border-gray-800 flex items-center justify-between px-4 z-40 relative">
-        <h1 className="font-extrabold text-xl tracking-tight text-blue-600 flex items-center gap-2"><Wallet size={24} /> InFinance</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-extrabold text-xl tracking-tight text-blue-600 flex items-center gap-2"><Wallet size={24} /> InFinance</h1>
+          {user && (
+            <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">{user.email}</span>
+          )}
+        </div>
         <button onClick={() => setMobileMenuOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"><Menu className="dark:text-white" /></button>
       </div>
 
@@ -390,7 +396,10 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
         <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 border-r dark:border-gray-800 p-6 gap-2 z-10 shadow-xl">
           <div className="flex items-center gap-3 mb-8 px-2">
             <div className="bg-blue-600 p-2 rounded-xl"><Wallet className="text-white" size={24} /></div>
-            <h1 className="font-bold text-2xl dark:text-white">InFinance</h1>
+            <div className="flex flex-col">
+              <h1 className="font-bold text-2xl dark:text-white">InFinance</h1>
+              {user && <span className="text-sm mt-0.5 text-gray-500 dark:text-gray-400">{user.email}</span>}
+            </div>
           </div>
           <button onClick={() => { setEditingItem(null); setIsTransactionModalOpen(true); }} className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all mb-6 shadow-lg shadow-blue-500/20 active:scale-95">+ Novo Lançamento</button>
           <nav className="space-y-2 flex-1">
@@ -407,9 +416,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
                <input type="file" onChange={importBackup} className="hidden" accept=".json" />
              </label>
              <button onClick={() => setDarkMode(!darkMode)} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">{darkMode ? <Sun size={18}/> : <Moon size={18}/>} Tema</button>
-             {onRequestLogin && (
-               <button onClick={onRequestLogin} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"><LogOut size={18}/> Trocar Conta</button>
-             )}
+             {/* 'Trocar Conta' removed - use 'Sair' to go back to login */}
              <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"><LogOut size={18}/> Sair</button>
           </div>
         </aside>
@@ -480,7 +487,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
                    <h2 className="text-2xl font-extrabold dark:text-white tracking-tight">Transações Recentes</h2>
                    <div className="relative w-full sm:w-64">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                      <input type="text" placeholder="Filtrar por nome..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-800 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"/>
+                      <input type="text" placeholder="Pesquisar descrição, categoria, valor ou data..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-800 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"/>
                    </div>
                 </div>
                 
@@ -613,47 +620,58 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
         </aside>
       </div>
 
-      <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-between items-end px-2 py-4 z-50 h-auto">
-        <button 
-          onClick={() => setShowGraph(false)} 
-          className={`flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all duration-300 ${!showGraph ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'}`}
-        >
-          <Home size={!showGraph ? 24 : 22} strokeWidth={!showGraph ? 2.5 : 2} />
-          <span className={`text-[10px] font-bold mt-1 ${!showGraph ? 'block' : 'hidden'}`}>Início</span>
-        </button>
-
-        <button 
-          onClick={() => setShowGraph(true)} 
-          className={`flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all duration-300 ${showGraph ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'}`}
-        >
-          <PieChart size={showGraph ? 24 : 22} strokeWidth={showGraph ? 2.5 : 2} />
-          <span className={`text-[10px] font-bold mt-1 ${showGraph ? 'block' : 'hidden'}`}>Análise</span>
-        </button>
-
-        <div className="relative top-8">
+      <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 grid grid-cols-5 gap-2 px-3 py-2 z-50">
+        {/* Each column is 20% width via grid-cols-5 */}
+        <div className="col-span-1 flex items-center justify-center">
           <button 
-            onClick={() => { setEditingItem(null); setIsTransactionModalOpen(true); }} 
-            className="flex items-center justify-center w-14 h-14 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-600/30 transform transition-transform active:scale-95 border-4 border-gray-50 dark:border-gray-950"
+            onClick={() => setShowGraph(false)} 
+            className={`w-full flex flex-col items-center justify-center rounded-2xl py-1 transition-all duration-150 ${!showGraph ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' : 'text-gray-400 dark:text-gray-400 hover:text-gray-600'}`}
           >
-            <Plus size={28} strokeWidth={3} />
+            <Home size={!showGraph ? 22 : 20} strokeWidth={!showGraph ? 2.5 : 2} />
+            <span className={`text-[10px] font-bold mt-1`}>Início</span>
           </button>
         </div>
 
-        <button 
-          onClick={() => setIsInvestmentManagerOpen(true)} 
-          className="flex flex-col items-center justify-center w-16 h-14 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-        >
-          <DollarSign size={22} />
-          <span className="text-[10px] font-medium mt-1">Metas</span>
-        </button>
+        <div className="col-span-1 flex items-center justify-center">
+          <button 
+            onClick={() => setShowGraph(true)} 
+            className={`w-full flex flex-col items-center justify-center rounded-2xl py-1 transition-all duration-150 ${showGraph ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' : 'text-gray-400 dark:text-gray-400 hover:text-gray-600'}`}
+          >
+            <PieChart size={22} strokeWidth={showGraph ? 2.5 : 2} />
+            <span className={`text-[10px] font-bold mt-1`}>Análise</span>
+          </button>
+        </div>
 
-        <button 
-          onClick={() => setIsCategoryManagerOpen(true)} 
-          className="flex flex-col items-center justify-center w-16 h-14 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-        >
-          <TrendingUp size={22} />
-          <span className="text-[10px] font-medium mt-1">Categ.</span>
-        </button>
+        <div className="col-span-1 flex items-center justify-center relative">
+          <div className="absolute -top-6">
+            <button 
+              onClick={() => { setEditingItem(null); setIsTransactionModalOpen(true); }} 
+              className="flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-600/30 transform transition-transform active:scale-95 border-4 border-white dark:border-gray-950"
+            >
+              <Plus size={28} strokeWidth={3} />
+            </button>
+          </div>
+        </div>
+
+        <div className="col-span-1 flex items-center justify-center">
+          <button 
+            onClick={() => setIsInvestmentManagerOpen(true)} 
+            className="w-full flex flex-col items-center justify-center rounded-2xl py-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+          >
+            <DollarSign size={22} />
+            <span className="text-[10px] font-medium mt-1">Metas</span>
+          </button>
+        </div>
+
+        <div className="col-span-1 flex items-center justify-center">
+          <button 
+            onClick={() => setIsCategoryManagerOpen(true)} 
+            className="w-full flex flex-col items-center justify-center rounded-2xl py-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+          >
+            <TrendingUp size={22} />
+            <span className="text-[10px] font-medium mt-1">Categorias</span>
+          </button>
+        </div>
       </footer>
 
       {/* MODALS */}
