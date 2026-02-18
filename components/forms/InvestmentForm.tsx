@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Investment } from '../../types';
 import { COLORS } from '../../constants';
-import { Target } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 
 interface InvestmentFormProps {
   editingItem: Investment | null;
@@ -76,7 +76,7 @@ export const InvestmentForm: React.FC<InvestmentFormProps> = ({ editingItem, onS
       </div>
 
       <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-4 rounded-2xl shadow-xl transition-all transform active:scale-95 flex items-center justify-center gap-2">
-        <Target size={20} /> Salvar Meta de Investimento
+        <DollarSign size={20} /> Salvar Meta de Investimento
       </button>
     </form>
   );

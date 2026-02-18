@@ -53,10 +53,10 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
     deleteCategoryData,
     addInvestment,
     updateInvestmentData,
-    deleteInvestmentData,
-    syncToCloud,
-    loadFromCloud
+    deleteInvestmentData
   } = useData();
+  
+  const [removingItem, setRemovingItem] = useState<{type: 'transaction'|'category'|'investment', id: string} | null>(null);
 
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('infinance_theme') === 'dark');
   const [searchTerm, setSearchTerm] = useState('');
@@ -156,17 +156,23 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
 
   const confirmDelete = async () => {
     if (!deletingItem) return;
-    try {
-      if (deletingItem.type === 'transaction') await deleteTransactionData(deletingItem.id);
-      else if (deletingItem.type === 'category') await deleteCategoryData(deletingItem.id);
-      else if (deletingItem.type === 'investment') await deleteInvestmentData(deletingItem.id);
-      
-      addToast("Item excluído com sucesso", 'info');
-    } catch (error) {
-      addToast("Erro ao excluir item", 'info');
-    }
+    // start slide-out animation then perform delete
     setIsConfirmOpen(false);
+    setRemovingItem(deletingItem);
+    const toDelete = deletingItem;
     setDeletingItem(null);
+    // allow particles/animation to play before actual deletion
+    setTimeout(async () => {
+      try {
+        if (toDelete.type === 'transaction') await deleteTransactionData(toDelete.id);
+        else if (toDelete.type === 'category') await deleteCategoryData(toDelete.id);
+        else if (toDelete.type === 'investment') await deleteInvestmentData(toDelete.id);
+        addToast("Item excluído com sucesso", 'info');
+      } catch (error) {
+        addToast("Erro ao excluir item", 'info');
+      }
+      setRemovingItem(null);
+    }, 750);
   };
 
   const handleSaveTransaction = async (data: Partial<Transaction>) => {
@@ -236,27 +242,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
     setEditingItem(null);
   };
 
-  const exportBackup = () => {
-    const data = JSON.stringify({ transactions, categories, investments, theme: darkMode ? 'dark' : 'light' });
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `backup-infinance-${new Date().toISOString().split('T')[0]}.json`; a.click();
-    addToast("Backup gerado com sucesso", 'info');
-  };
-
-  const importBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target?.result as string);
-        // Os dados serão carregados via Context
-        addToast("Backup restaurado!", 'success');
-      } catch (err) { alert("Erro ao importar."); }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  };
+  // backup export/import removed from UI
 
   const handleExportPDF = async () => {
     let chartUri = undefined;
@@ -333,6 +319,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
 
   return (
     <div className={`flex flex-col h-full overflow-hidden ${darkMode ? 'dark' : ''}`}>
+        {/* particle CSS removed - only flush animation retained */}
       <Fireworks active={fireworksActive} onComplete={() => setFireworksActive(false)} />
       
       <div className="fixed bottom-4 left-4 z-[100] flex flex-col items-start pointer-events-none">
@@ -355,13 +342,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
                 <button onClick={() => { setIsPDFModalOpen(true); setMobileMenuOpen(false); }} className="flex items-center gap-3 w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl font-bold text-gray-600 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
                    <Download size={20} /> Exportar Relatório
                 </button>
-                <button onClick={exportBackup} className="flex items-center gap-3 w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl font-bold text-gray-600 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
-                   <Save size={20} /> Salvar Backup
-                </button>
-                <label className="flex items-center gap-3 w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl font-bold text-gray-600 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors cursor-pointer">
-                   <Upload size={20} /> Restaurar Backup
-                   <input type="file" onChange={importBackup} className="hidden" accept=".json" />
-                </label>
+                 {/* Backup export/import removed from mobile menu */}
                 <button onClick={() => setDarkMode(!darkMode)} className="flex items-center gap-3 w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl font-bold text-gray-600 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
                    {darkMode ? <Sun size={20} /> : <Moon size={20} />} Alternar Tema
                 </button>
@@ -409,12 +390,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
           </nav>
           <div className="mt-auto border-t dark:border-gray-800 pt-4 space-y-1">
              <button onClick={() => setIsPDFModalOpen(true)} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"><Download size={18}/> Exportar PDF</button>
-             <button onClick={exportBackup} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"><Save size={18}/> Salvar Backup</button>
-             <label className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
-               <Upload size={18}/> 
-               <span>Restaurar Backup</span>
-               <input type="file" onChange={importBackup} className="hidden" accept=".json" />
-             </label>
+             {/* Backup export/import removed from sidebar */}
              <button onClick={() => setDarkMode(!darkMode)} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">{darkMode ? <Sun size={18}/> : <Moon size={18}/>} Tema</button>
              {/* 'Trocar Conta' removed - use 'Sair' to go back to login */}
              <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"><LogOut size={18}/> Sair</button>
@@ -513,7 +489,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
                               const categoryColor = t.type === 'investimento' ? investment?.color : category?.color;
                               const categoryName = t.type === 'investimento' ? investment?.name : category?.name;
                               return (
-                                <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 group transition-colors">
+                                <tr key={t.id} className={`hover:bg-gray-50 dark:hover:bg-gray-800/30 group transition-all ${removingItem?.type === 'transaction' && removingItem.id === t.id ? 'transform scale-0 rotate-6 opacity-0 blur-sm transition-all duration-300 origin-center' : ''}`}>
                                   <td className="px-6 py-5 whitespace-nowrap text-gray-400 font-bold text-xs">{new Date(t.date).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})}</td>
                                   <td className="px-6 py-5 whitespace-nowrap">
                                     <p className="font-bold dark:text-white group-hover:text-blue-600 transition-colors">{t.description || <span className="italic opacity-40">Sem descrição</span>}</p>
@@ -599,13 +575,17 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
                 {investmentBalances.map(inv => {
                    const percent = Math.min(100, (inv.calculatedValue / inv.goalValue) * 100);
                    return (
-                     <div key={inv.id} className="bg-white dark:bg-gray-800 p-5 rounded-[24px] border-2 border-gray-50 dark:border-gray-800 shadow-sm group hover:border-blue-200 dark:hover:border-blue-900 transition-all">
+                     <div key={inv.id} className={`bg-white dark:bg-gray-800 p-5 rounded-[24px] border-2 border-gray-50 dark:border-gray-800 shadow-sm group hover:border-blue-200 dark:hover:border-blue-900 transition-all ${removingItem?.type === 'investment' && removingItem.id === inv.id ? 'transform scale-0 rotate-6 opacity-0 blur-sm transition-all duration-700 origin-center' : ''}`}>
                         <div className="flex justify-between text-xs mb-3 font-black dark:text-white uppercase tracking-tighter">
                           <span>{inv.name}</span>
                           <span className="text-blue-500">{Math.round(percent)}%</span>
                         </div>
-                        <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                           <div className="h-full bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${percent}%`, backgroundColor: inv.color }}></div>
+                        <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-4 overflow-hidden relative">
+                           <div className="h-full transition-all duration-1000 ease-out shadow-inner" style={{ width: `${percent}%`, background: `linear-gradient(90deg, ${inv.color}, rgba(0,0,0,0.08))` }}>
+                              {percent > 6 && (
+                                <div className="text-[11px] font-extrabold text-white px-2 leading-4" style={{ textShadow: '0 1px 1px rgba(0,0,0,0.3)' }}>{Math.round(percent)}%</div>
+                              )}
+                           </div>
                         </div>
                         <div className="mt-3 flex justify-between text-[10px] font-bold text-gray-400">
                           <span>{inv.calculatedValue.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</span>
@@ -690,10 +670,13 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
              <button onClick={() => { setEditingItem(null); setIsCategoryEditorOpen(true); }} className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl text-gray-400 hover:text-blue-600 hover:border-blue-500 transition-all font-bold">+ Criar Nova Categoria</button>
              <div className="max-h-[50vh] overflow-y-auto space-y-2 custom-scrollbar">
                 {categories.map(c => (
-                  <div key={c.id} className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-transparent hover:border-blue-100 transition-all">
+                  <div key={c.id} className={`flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-transparent hover:border-blue-100 transition-all ${removingItem?.type === 'category' && removingItem.id === c.id ? 'transform scale-0 rotate-6 opacity-0 blur-sm transition-all duration-300 origin-center' : ''}`}>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full shadow-sm" style={{backgroundColor: c.color}}></div>
-                      <span className="font-bold dark:text-gray-200">{c.name}</span>
+                      <div>
+                        <span className="font-bold dark:text-gray-200">{c.name}</span>
+                        <div className="text-xs font-bold mt-1" style={{color: c.type === 'gasto' ? '#EF4444' : '#3B82F6'}}>{c.type === 'gasto' ? 'Gasto' : 'Entrada'}</div>
+                      </div>
                     </div>
                     <div className="flex gap-1">
                       <button onClick={() => { setEditingItem(c); setIsCategoryEditorOpen(true); }} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-white rounded-xl transition-all"><Edit2 size={16}/></button>
@@ -714,7 +697,7 @@ export default function AppContent({ onRequestLogin }: { onRequestLogin?: () => 
             <button onClick={() => { setEditingItem(null); setIsInvestmentEditorOpen(true); }} className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl text-gray-400 hover:text-indigo-600 hover:border-indigo-500 transition-all font-bold">+ Definir Nova Meta</button>
             <div className="max-h-[50vh] overflow-y-auto space-y-2 custom-scrollbar">
                 {investments.map(i => (
-                  <div key={i.id} className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-transparent hover:border-indigo-100 transition-all">
+                  <div key={i.id} className={`flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-transparent hover:border-indigo-100 transition-all ${removingItem?.type === 'investment' && removingItem.id === i.id ? 'transform scale-0 rotate-6 opacity-0 blur-sm transition-all duration-700 origin-center' : ''}`}>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full shadow-sm" style={{backgroundColor: i.color}}></div>
                       <span className="font-bold dark:text-gray-200">{i.name}</span>

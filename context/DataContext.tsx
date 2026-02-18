@@ -14,7 +14,7 @@ import {
   saveInvestimento,
   updateInvestimento,
   deleteInvestimento,
-  saveBackupJSON
+  // backup functions removed from public API
 } from '../services/firestoreService';
 import type { Transaction, Category, Investment, BackupData } from '../types';
 import { DEFAULT_CATEGORIES } from '../constants';
@@ -41,9 +41,7 @@ interface DataContextType {
   addInvestment: (i: Omit<Investment, 'id'>) => Promise<void>;
   updateInvestmentData: (id: string, data: Partial<Investment>) => Promise<void>;
   deleteInvestmentData: (id: string) => Promise<void>;
-
-  syncToCloud: () => Promise<void>;
-  loadFromCloud: () => Promise<void>;
+  // cloud sync intentionally removed from context
 }
 
 export const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -320,24 +318,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     }
   }, [user, useCloudSync, transactions, categories]);
 
-  // Sincronização
-  const syncToCloud = useCallback(async () => {
-    if (!user) throw new Error('Usuário não autenticado');
-    
-    const backup: BackupData = {
-      transactions,
-      categories,
-      investments,
-      theme: (localStorage.getItem('infinance_theme') || 'light') as 'light' | 'dark'
-    };
-
-    await saveBackupJSON(`backup_${new Date().toISOString()}`, backup);
-  }, [user, transactions, categories, investments]);
-
-  const loadFromCloud = useCallback(async () => {
-    if (!user) throw new Error('Usuário não autenticado');
-    await loadFromCloudData();
-  }, [user, loadFromCloudData]);
+  // cloud sync helpers removed (backup UI/options removed)
 
   const value: DataContextType = {
     user,
@@ -360,8 +341,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     addInvestment,
     updateInvestmentData,
     deleteInvestmentData,
-    syncToCloud,
-    loadFromCloud
+    // cloud sync intentionally omitted
   };
 
   return (

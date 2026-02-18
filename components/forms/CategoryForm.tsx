@@ -43,11 +43,18 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ editingItem, onSave 
           <button
             type="button"
             onClick={() => setType('entrada')}
-            className={`py-3 rounded-xl text-sm font-bold transition-all ${type === 'entrada' ? 'bg-white dark:bg-gray-700 text-green-500 shadow-md' : 'text-gray-500'}`}
+            className={`py-3 rounded-xl text-sm font-bold transition-all ${type === 'entrada' ? 'bg-white dark:bg-gray-700 text-blue-500 shadow-md' : 'text-gray-500'}`}
           >
             Entrada
           </button>
         </div>
+        <p className="text-xs text-gray-500 mt-2">
+          {type === 'gasto' ? (
+            <span>Uma categoria declarada como gasto é tudo aquilo que desconta do seu saldo. Ex: Assinatura de streaming.</span>
+          ) : (
+            <span>Uma categoria declarada como entrada é tudo aquilo que agrega no seu saldo. Ex: Pagamento de cliente (freelance).</span>
+          )}
+        </p>
       </div>
 
       <div className="space-y-3">

@@ -37,10 +37,34 @@ export const ConfirmModal: React.FC<{
   message: string;
 }> = ({ isOpen, onClose, onConfirm, message }) => (
   <Modal isOpen={isOpen} onClose={onClose} title="Confirmação" zIndex={60}>
-    <p className="mb-6 text-gray-600 dark:text-gray-300 text-base leading-relaxed">{message}</p>
-    <div className="flex justify-end gap-3">
-      <button onClick={onClose} className="px-5 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl dark:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Cancelar</button>
-      <button onClick={onConfirm} className="px-5 py-2.5 text-sm font-medium bg-red-500 text-white rounded-xl hover:bg-red-600 shadow-md transition-all transform hover:scale-105">Confirmar</button>
-    </div>
+    <ConfirmInner message={message} onClose={onClose} onConfirm={onConfirm} isOpen={isOpen} />
   </Modal>
 );
+
+const ConfirmInner: React.FC<{ message: string; onClose: () => void; onConfirm: () => void; isOpen: boolean }> = ({ message, onClose, onConfirm, isOpen }) => {
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onConfirm();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isOpen, onConfirm, onClose]);
+
+  return (
+    <>
+      <p className="mb-6 text-gray-600 dark:text-gray-300 text-base leading-relaxed">{message}</p>
+      <div className="flex justify-end gap-3">
+        <button onClick={onClose} className="px-5 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl dark:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Cancelar</button>
+        <button onClick={onConfirm} className="px-5 py-2.5 text-sm font-medium bg-red-500 text-white rounded-xl hover:bg-red-600 shadow-md transition-all transform hover:scale-105">Confirmar</button>
+      </div>
+    </>
+  );
+};
